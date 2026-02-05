@@ -127,6 +127,8 @@ class RuleMetadata(
         default=RemediationComplexity.UNKNOWN
     )
     deprecation: Deprecation = msgspec.field(default=Deprecation())  # it's immutable so can a default
+    cloud: str
+    events: dict | None = msgspec.field(default=None)
 
     def __repr__(self) -> str:
         return (
@@ -223,6 +225,7 @@ EMPTY_RULE_METADATA = RuleMetadata(
     article='',
     impact='',
     remediation='',
+    cloud='',
 )
 EMPTY_DOMAIN_METADATA = DomainMetadata()
 
@@ -256,6 +259,7 @@ class Metadata(msgspec.Struct, frozen=True, eq=False):
             impact='',
             remediation='',
             standard={index.source: {'null': ()}} if index.source else {},
+            cloud=index.cloud or '',
         )
 
     def domain(self, name: str | Enum, /) -> DomainMetadata:
