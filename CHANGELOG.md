@@ -5,7 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.16.0] - 2026-01-05
+## [5.17.0] - 2026-02-05
+
+### Added
+- Added Event-Driven (ED) jobs support for AMI installation
+- Added `STANDARD`, `SCHEDULED` to the `JobType` enum
+
+### Fixed
+- Fixed invalid `next_token` handling
+- Fixed issue with double creation of indexes for `SREResources` and `SREResourceExceptions` collections
+
+### Changed
+- Changed the `JobType` enum to include `STANDARD`, `SCHEDULED` and `MANUAL`
+
+### Removed
+- Removed `SREBatchResults` model and related endpoints and services
+
+## [5.16.0] - 2026-01-30
 - Added validation of downloaded rulesets to ensure they are valid JSON
 - Added the parameter `overwrite_rulesets` for the `POST /licenses/{license_key}/sync` endpoint that allows to overwrite existing ruleset data in S3
 - Added the possibility to update the rulesource `type`, `git_url`, `git_ref`, `git_rules_prefix` and  `git_project_id` parameters in the `PATCH /rule-sources/{id}` endpoint
@@ -13,9 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the parameter `description` to the `POST /rulesets` and `PATCH /rulesets/{name}/{version}` endpoints
 - Added the possibility to scan linked tenants
 - Added the possibility to get project-level reports with linked tenants' reports included
-- Changed `created_at`, `updated_at`, and `expire_at` fields in resource exception responses to return human-readable ISO format dates instead of Unix timestamps
-- Changed the logic of validating ARNs in resource exception creation to check if the ARN exists in the resources database for the specific tenant
-- Fixed an issue with credentials environment variables when using PosixPath objects instead of strings for AZURE credentials
 - Updated `sre-init.sh` and `ami-initialize.sh` scripts
   - Added support contact email to critical error messages (License Manager, Helm failures)
   - Added success message after backup retry operations
@@ -24,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue returning internal server error when operational reports are generated
 - Fixed an issue related to rewriting a k8s platform during creation if the type is not SELF_MANAGED
 - Fixed an issue with resource collection when pod killed during memory limit exceeded
+
 - Fixed license expiration updating in case of 404 status code returned from the license sync request
 - Updated versions of dependencies:
     - `c7n` from `0.9.46` to `0.9.49`
@@ -36,6 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `google-api-python-client` from `~=2.176.0` to `~=2.188.0`
     - `google-auth` from `~=2.40.0` to `~=2.47.0`
 - Hidden unused endpoint `GET /reports/diagnostic` from the API
+- Changed `created_at`, `updated_at`, and `expire_at` fields in resource exception responses to return human-readable ISO format dates instead of Unix timestamps
+- Changed the logic of validating ARNs in resource exception creation to check if the ARN exists in the resources database for the specific tenant
+- Changed the log message in the report metrics to use dynamic database terminology based on the database type
+- Fixed an issue with credentials environment variables when using PosixPath objects instead of strings for AZURE credentials
+- Fixed an issue returning internal server error when operational reports are generated
+- Fixed an issue related to rewriting a k8s platform during creation if the type is not SELF_MANAGED
+- Fixed an issue with resource collection when pod killed during memory limit exceeded
+- Fixed license expiration updating in case of 404 status code returned from the license sync request
+
+## [5.15.1] - 2026-01-02
+- Bump MongoDB Version due to CVE-2025-14847 Vulnerability
 
 ## [5.15.0] - 2025-11-06
 - Added hiding expired resource exceptions
