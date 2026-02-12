@@ -260,7 +260,6 @@ class Metadata(msgspec.Struct, frozen=True, eq=False):
             impact='',
             remediation='',
             standard={index.source: {'null': ()}} if index.source else {},
-            cloud=index.cloud or '',
         )
 
     def domain(self, name: str | Enum, /) -> DomainMetadata:

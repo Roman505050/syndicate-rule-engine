@@ -75,7 +75,7 @@ class MCCResourceType(str, Enum):
     LOG_GROUP = "LOG_GROUP"  # CloudWatch log groups, Log Analytics workspaces
 
 
-class K8SResourceType(str, Enum):
+class K8SMCCResourceType(str, Enum):
     """
     Resource types for Kubernetes.
     """
@@ -90,31 +90,31 @@ class K8SResourceType(str, Enum):
     SERVICE_ACCOUNT = "SERVICE_ACCOUNT"
 
 
-_K8S_MAP: dict[str, K8SResourceType] = {
-    "k8s.cluster-role": K8SResourceType.ROLE,
-    "k8s.config-map": K8SResourceType.CONFIG,
-    "k8s.deployment": K8SResourceType.DEPLOYMENT,
-    "k8s.namespace": K8SResourceType.NAMESPACE,
-    "k8s.pod": K8SResourceType.POD,
-    "k8s.role": K8SResourceType.ROLE,
-    "k8s.secret": K8SResourceType.SECRET,
-    "k8s.service-account": K8SResourceType.SERVICE_ACCOUNT,
+_K8S_MAP: dict[str, K8SMCCResourceType] = {
+    "k8s.cluster-role": K8SMCCResourceType.ROLE,
+    "k8s.config-map": K8SMCCResourceType.CONFIG,
+    "k8s.deployment": K8SMCCResourceType.DEPLOYMENT,
+    "k8s.namespace": K8SMCCResourceType.NAMESPACE,
+    "k8s.pod": K8SMCCResourceType.POD,
+    "k8s.role": K8SMCCResourceType.ROLE,
+    "k8s.secret": K8SMCCResourceType.SECRET,
+    "k8s.service-account": K8SMCCResourceType.SERVICE_ACCOUNT,
 
     # Others
-    "k8s.cluster-role-binding": K8SResourceType.ROLE,
-    "k8s.role-binding": K8SResourceType.ROLE,
-    "k8s.network-policy": K8SResourceType.CONFIG,
-    "k8s.persistent-volume": K8SResourceType.CONFIG,
-    "k8s.persistent-volume-claim": K8SResourceType.CONFIG,
-    "k8s.service": K8SResourceType.CONFIG,
-    "k8s.daemonset": K8SResourceType.DEPLOYMENT,
-    "k8s.statefulset": K8SResourceType.DEPLOYMENT,
-    "k8s.replicaset": K8SResourceType.DEPLOYMENT,
-    "k8s.job": K8SResourceType.DEPLOYMENT,
-    "k8s.cronjob": K8SResourceType.DEPLOYMENT,
+    "k8s.cluster-role-binding": K8SMCCResourceType.ROLE,
+    "k8s.role-binding": K8SMCCResourceType.ROLE,
+    "k8s.network-policy": K8SMCCResourceType.CONFIG,
+    "k8s.persistent-volume": K8SMCCResourceType.CONFIG,
+    "k8s.persistent-volume-claim": K8SMCCResourceType.CONFIG,
+    "k8s.service": K8SMCCResourceType.CONFIG,
+    "k8s.daemonset": K8SMCCResourceType.DEPLOYMENT,
+    "k8s.statefulset": K8SMCCResourceType.DEPLOYMENT,
+    "k8s.replicaset": K8SMCCResourceType.DEPLOYMENT,
+    "k8s.job": K8SMCCResourceType.DEPLOYMENT,
+    "k8s.cronjob": K8SMCCResourceType.DEPLOYMENT,
 }
 
-RESOURCE_TYPE_MAPPING: dict[Cloud, dict[str, MCCResourceType] | dict[str, K8SResourceType]] = {
+RESOURCE_TYPE_MAPPING: dict[Cloud, dict[str, MCCResourceType] | dict[str, K8SMCCResourceType]] = {
     Cloud.AWS: {
         # Account & Organization
         "account": MCCResourceType.TENANT,

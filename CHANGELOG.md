@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Changed the `JobType` enum to include `STANDARD`, `SCHEDULED` and `MANUAL`
+- Updated recommendations processing logic to use all available rules for generating
 
 ### Removed
 - Removed `SREBatchResults` model and related endpoints and services

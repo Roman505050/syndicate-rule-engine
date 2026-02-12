@@ -8,11 +8,11 @@ from helpers.constants import Cloud, RemediationComplexity
 from services.metadata import Metadata, RuleMetadata
 from services.resources import iter_rule_region_resources
 from services.sharding import ShardPart, ShardsCollection
-from .constants import (
+from ._constants import (
     SOURCE,
     RESOURCE_TYPE_MAPPING,
     MCCResourceType,
-    K8SResourceType,
+    K8SMCCResourceType,
     DEFAULT_DESCRIPTION,
 )
 
@@ -197,7 +197,7 @@ class K8SRecommendationBuilder(BaseRecommendationBuilder[K8SRecommendationsMappi
             resource_type_mapping = RESOURCE_TYPE_MAPPING.get(cloud, {})
             for resource in part.resources:
                 resource_type = resource_type_mapping.get(
-                    resource["resource_type"], K8SResourceType.UNKNOWN
+                    resource["resource_type"], K8SMCCResourceType.UNKNOWN
                 )
                 item = K8SRecommendationItem(
                     resource_id=self._application_uuid,
