@@ -226,7 +226,6 @@ EMPTY_RULE_METADATA = RuleMetadata(
     article='',
     impact='',
     remediation='',
-    cloud='',
 )
 EMPTY_DOMAIN_METADATA = DomainMetadata()
 
