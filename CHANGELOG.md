@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Changed the `JobType` enum to include `STANDARD`, `SCHEDULED` and `MANUAL`
+- Updated recommendations processing logic to use all available rules for generating
 - Changed modular-sdk version from `7.1.6` to `7.1.9`
 
 ### Removed
