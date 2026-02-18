@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added Event-Driven (ED) jobs support for AMI installation
 - Added `STANDARD`, `SCHEDULED` to the `JobType` enum
+- Added recipient validation emails for reports based on the associated Tenant or Customer
 
 ### Fixed
 - Fixed invalid `next_token` handling

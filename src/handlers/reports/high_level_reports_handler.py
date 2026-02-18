@@ -9,6 +9,7 @@ from botocore.exceptions import ClientError
 from dateutil.relativedelta import relativedelta
 from modular_sdk.models.tenant import Tenant
 from modular_sdk.modular import Modular
+from rsa.cli import verify
 from typing_extensions import NotRequired, TypedDict
 
 from handlers import AbstractHandler, Mapping
@@ -1032,6 +1033,9 @@ class HighLevelReportsHandler(AbstractHandler):
 
     @validate_kwargs
     def post_c_level(self, event: CLevelGetReportModel):
+        # filter receivers
+        event.receivers = self._filter_resievers(event=event)
+
         models = []
         rabbitmq = self._rmq.get_customer_rabbitmq(event.customer_id)
         if not rabbitmq:
@@ -1488,3 +1492,18 @@ class HighLevelReportsHandler(AbstractHandler):
             result.append(data)
 
         return result
+
+    def _filter_resievers(self, event: Any) -> set[str]:
+        verify_receivers = []
+
+        for tenant_name in event.tenant_names:
+            tenant = self._mc.tenant_service().get(tenant_name)
+            contacts = tenant.get('contacts', [])
+
+            for receiver in event.receivers:
+                if receiver.name in contacts:
+                    verify_receivers.append(receiver)
+                else:
+                    _LOG.warning(f"Skipping receiver {receiver} as unknown.")
+
+        return set(verify_receivers)
