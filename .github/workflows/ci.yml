@@ -179,6 +179,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
+          platforms: linux/amd64
 
       - name: Validate patch (isolated)
         run: |
