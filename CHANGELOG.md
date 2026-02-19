@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.17.0] - 2026-02-05
+
+### Added
+- Added Event-Driven (ED) jobs support for AMI installation
+- Added `STANDARD`, `SCHEDULED` to the `JobType` enum
+- Added description, deprecation date, and reason to the deprecated rules in the operational reports
+- Added `category` field to `OPERATIONAL RULES` report to distinguish rules with identical fingerprints
+- Added fingerprint to the `Rule` model and `SRERules` collection for rule deduplication, optimizing API requests to cloud providers
+
+### Fixed
+- Fixed invalid `next_token` handling
+- Fixed issue with double creation of indexes for `SREResources` and `SREResourceExceptions` collections
+- Fixed issue when operational overview report returns `list` instead of `dict` as fallback value for `rules_data` field
+- Fixed JSON decoding errors when License Manager returns text responses instead of JSON
+
+### Changed
+- Changed the `JobType` enum to include `STANDARD`, `SCHEDULED` and `MANUAL`
+- Updated recommendations processing logic to use all available rules for generating
+- Changed modular-sdk version from `7.1.6` to `7.1.9`
+
+### Removed
+- Removed `SREBatchResults` model and related endpoints and services
+
 ## [5.16.0] - 2026-01-30
 - Added validation of downloaded rulesets to ensure they are valid JSON
 - Added the parameter `overwrite_rulesets` for the `POST /licenses/{license_key}/sync` endpoint that allows to overwrite existing ruleset data in S3
@@ -17,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added support contact email to critical error messages (License Manager, Helm failures)
   - Added success message after backup retry operations
   - Fixed typo in `ami-initialize.sh`: `error_log` → `log_err`
+- Changed the log message in the report metrics to use dynamic database terminology based on the database type
+- Fixed an issue returning internal server error when operational reports are generated
+- Fixed an issue related to rewriting a k8s platform during creation if the type is not SELF_MANAGED
+- Fixed an issue with resource collection when pod killed during memory limit exceeded
+
+- Fixed license expiration updating in case of 404 status code returned from the license sync request
 - Updated versions of dependencies:
     - `c7n` from `0.9.46` to `0.9.49`
     - `c7n-azure` from `0.7.45` to `0.7.48`
