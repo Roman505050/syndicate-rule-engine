@@ -1034,7 +1034,7 @@ class HighLevelReportsHandler(AbstractHandler):
     @validate_kwargs
     def post_c_level(self, event: CLevelGetReportModel):
         # filter receivers
-        event.receivers = self._filter_resievers(event=event)
+        event.receivers, failed_receivers = self._filter_resievers(event=event)
 
         models = []
         rabbitmq = self._rmq.get_customer_rabbitmq(event.customer_id)
@@ -1103,7 +1103,10 @@ class HighLevelReportsHandler(AbstractHandler):
                 .exc()
             )
         return build_response(
-            code=HTTPStatus.ACCEPTED, content='Successfully sent'
+            code=HTTPStatus.ACCEPTED,
+            content='Successfully sent' if not failed_receivers else
+            f"Successfully sent, except for emails thet do not belong to the customer or tenant: "
+            f"{', '.join(failed_receivers)}"
         )
 
     @validate_kwargs
@@ -1111,7 +1114,7 @@ class HighLevelReportsHandler(AbstractHandler):
         self, event: OperationalGetReportModel, _tap: TenantsAccessPayload
     ):
         # filter receivers
-        event.receivers = self._filter_resievers(event=event)
+        event.receivers, failed_receivers = self._filter_resievers(event=event)
         models = []
         rabbitmq = self._rmq.get_customer_rabbitmq(event.customer_id)
         if not rabbitmq:
@@ -1252,7 +1255,10 @@ class HighLevelReportsHandler(AbstractHandler):
                 .exc()
             )
         return build_response(
-            code=HTTPStatus.ACCEPTED, content='Successfully sent'
+            code=HTTPStatus.ACCEPTED,
+            content='Successfully sent' if not failed_receivers else
+            f"Successfully sent, except for emails thet do not belong to the customer or tenant: "
+            f"{', '.join(failed_receivers)}"
         )
 
     @validate_kwargs
@@ -1260,7 +1266,7 @@ class HighLevelReportsHandler(AbstractHandler):
         self, event: ProjectGetReportModel, _tap: TenantsAccessPayload
     ):
         # filter receivers
-        event.receivers = self._filter_resievers(event=event)
+        event.receivers, failed_receivers = self._filter_resievers(event=event)
         models = []
         customer_id = event.customer_id
         rabbitmq = self._rmq.get_customer_rabbitmq(customer_id)
@@ -1345,13 +1351,16 @@ class HighLevelReportsHandler(AbstractHandler):
                 .exc()
             )
         return build_response(
-            code=HTTPStatus.ACCEPTED, content='Successfully sent'
+            code=HTTPStatus.ACCEPTED,
+            content='Successfully sent' if not failed_receivers else
+            f"Successfully sent, except for emails thet do not belong to the customer or tenant: "
+            f"{', '.join(failed_receivers)}"
         )
 
     @validate_kwargs
     def post_department(self, event: DepartmentGetReportModel):
         # filter receivers
-        event.receivers = self._filter_resievers(event=event)
+        event.receivers, failed_receivers = self._filter_resievers(event=event)
         models = []
         rabbitmq = self._rmq.get_customer_rabbitmq(event.customer_id)
         if not rabbitmq:
@@ -1423,7 +1432,10 @@ class HighLevelReportsHandler(AbstractHandler):
                 .exc()
             )
         return build_response(
-            code=HTTPStatus.ACCEPTED, content='Successfully sent'
+            code=HTTPStatus.ACCEPTED,
+            content='Successfully sent' if not failed_receivers else
+            f"Successfully sent, except for emails thet do not belong to the customer or tenant: "
+            f"{', '.join(failed_receivers)}"
         )
 
     def _validate_report_exists(
@@ -1499,17 +1511,21 @@ class HighLevelReportsHandler(AbstractHandler):
 
         return result
 
-    def _filter_resievers(self, event: Any) -> set[str]:
+    def _filter_resievers(self, event: Any) -> tuple[set[str], list[str]]:
         verified_receivers = []
+        failed_receivers = []
 
         for tenant_name in event.tenant_names:
             tenant = self._mc.tenant_service().get(tenant_name)
-            contacts = tenant.contacts
+            customer = self._mc.customer_service().get(tenant_name)
+            contacts = tenant.contacts + customer.admins
 
             for receiver in event.receivers:
                 if receiver.name in contacts:
                     verified_receivers.append(receiver)
                 else:
-                    _LOG.warning(f"Skipping receiver {receiver} as unknown.")
+                    failed_receivers.append(receiver)
 
-        return set(verified_receivers)
+        _LOG.warning(f"Skipping receivers as unknown: "
+                     f"{', '.join(failed_receivers)}")
+        return set(verified_receivers), failed_receivers
