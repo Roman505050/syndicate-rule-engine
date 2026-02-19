@@ -1511,21 +1511,26 @@ class HighLevelReportsHandler(AbstractHandler):
 
         return result
 
-    def _filter_resievers(self, event: Any) -> tuple[set[str], list[str]]:
-        verified_receivers = []
-        failed_receivers = []
-
+    def _filter_resievers(self, event: Any) -> tuple[set[str], set[str]]:
+        """Filters emails based on the presence of Customer administrators and Tenant contacts"""
+        # 1. Aggregate all valid contacts first
+        authorized_contacts = set()
         for tenant_name in event.tenant_names:
             tenant = self._mc.tenant_service().get(tenant_name)
             customer = self._mc.customer_service().get(tenant_name)
-            contacts: set = tenant.contacts | customer.admins
+            authorized_contacts.update(set(tenant.contacts) | set(customer.admins))
 
-            for receiver in event.receivers:
-                if receiver.name in contacts:
-                    verified_receivers.append(receiver)
-                else:
-                    failed_receivers.append(receiver)
+        verified_receivers = set()
+        failed_receivers = set()
 
-        _LOG.warning(f"Skipping receivers as unknown: "
-                     f"{', '.join(failed_receivers)}")
-        return set(verified_receivers), failed_receivers
+        # 2. Single pass over receivers and its division
+        for receiver in event.receivers:
+            if receiver.name in authorized_contacts:
+                verified_receivers.add(receiver)
+            else:
+                failed_receivers.add(receiver)
+
+        if failed_receivers:
+            _LOG.warning(f"Skipping receivers as unknown: "
+                         f"{', '.join(failed_receivers)}")
+        return verified_receivers, failed_receivers
