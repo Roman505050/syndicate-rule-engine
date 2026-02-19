@@ -1110,6 +1110,8 @@ class HighLevelReportsHandler(AbstractHandler):
     def post_operational(
         self, event: OperationalGetReportModel, _tap: TenantsAccessPayload
     ):
+        # filter receivers
+        event.receivers = self._filter_resievers(event=event)
         models = []
         rabbitmq = self._rmq.get_customer_rabbitmq(event.customer_id)
         if not rabbitmq:
@@ -1257,6 +1259,8 @@ class HighLevelReportsHandler(AbstractHandler):
     def post_project(
         self, event: ProjectGetReportModel, _tap: TenantsAccessPayload
     ):
+        # filter receivers
+        event.receivers = self._filter_resievers(event=event)
         models = []
         customer_id = event.customer_id
         rabbitmq = self._rmq.get_customer_rabbitmq(customer_id)
@@ -1346,6 +1350,8 @@ class HighLevelReportsHandler(AbstractHandler):
 
     @validate_kwargs
     def post_department(self, event: DepartmentGetReportModel):
+        # filter receivers
+        event.receivers = self._filter_resievers(event=event)
         models = []
         rabbitmq = self._rmq.get_customer_rabbitmq(event.customer_id)
         if not rabbitmq:
@@ -1494,16 +1500,16 @@ class HighLevelReportsHandler(AbstractHandler):
         return result
 
     def _filter_resievers(self, event: Any) -> set[str]:
-        verify_receivers = []
+        verified_receivers = []
 
         for tenant_name in event.tenant_names:
             tenant = self._mc.tenant_service().get(tenant_name)
-            contacts = tenant.get('contacts', [])
+            contacts = tenant.contacts
 
             for receiver in event.receivers:
                 if receiver.name in contacts:
-                    verify_receivers.append(receiver)
+                    verified_receivers.append(receiver)
                 else:
                     _LOG.warning(f"Skipping receiver {receiver} as unknown.")
 
-        return set(verify_receivers)
+        return set(verified_receivers)
