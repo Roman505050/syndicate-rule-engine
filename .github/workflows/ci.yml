@@ -13,7 +13,8 @@ jobs:
   check_modified_files:
     if: >
       github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository ||
-      github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && github.event.pull_request.head.repo.full_name != github.repository
+      github.event_name == 'pull_request_review' && github.event.review.state == 'approved' && github.event.pull_request.head.repo.full_name != github.repository ||
+      github.event_name == 'push'
     name: Check modified files in directories
     runs-on: ubuntu-latest
     outputs:
