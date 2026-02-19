@@ -23,6 +23,7 @@ from common.base import BasePatch
 _LOG = get_logger(__name__)
 
 
+
 class PatchFingerprints(BasePatch):
     """Patch for backfilling rule fingerprints."""
 

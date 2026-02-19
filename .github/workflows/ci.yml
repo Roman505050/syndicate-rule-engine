@@ -26,16 +26,25 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.pull_request.head.sha }}
+        ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+    - name: Determine base SHA
+      id: base_sha
+      run: |
+        if [ "${{ github.event_name }}" == "push" ]; then
+          echo "sha=${{ github.event.before }}" >> $GITHUB_OUTPUT
+        else
+          echo "sha=${{ github.event.pull_request.base.sha }}" >> $GITHUB_OUTPUT
+        fi
 
     - name: Check modified files in cli directory
       id: check_cli_files
       shell: bash
       run: |
         ls -la ./.github/workflows/
-        git fetch origin ${{ github.event.pull_request.base.sha }}
-        changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }})
+        BASE_SHA="${{ steps.base_sha.outputs.sha }}"
+        git fetch origin ${BASE_SHA} || true
+        changed_files=$(git diff --name-only ${BASE_SHA} || echo "")
         echo "Changed files: ${changed_files}"
         checked_directory="cli/"
         for file in ${changed_files}
@@ -55,8 +64,9 @@ jobs:
       id: check_src_files
       shell: bash
       run: |
-        git fetch origin ${{ github.event.pull_request.base.sha }}
-        changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }})
+        BASE_SHA="${{ steps.base_sha.outputs.sha }}"
+        git fetch origin ${BASE_SHA} || true
+        changed_files=$(git diff --name-only ${BASE_SHA} || echo "")
         echo "Changed files: ${changed_files}"
         checked_directory="src/"
         for file in ${changed_files}
@@ -76,15 +86,20 @@ jobs:
       id: check_patches_files
       shell: bash
       run: |
-        git fetch origin ${{ github.event.pull_request.base.sha }}
-        changed_files=$(git diff --name-only ${{ github.event.pull_request.base.sha }})
+        BASE_SHA="${{ steps.base_sha.outputs.sha }}"
+        echo "Base SHA: ${BASE_SHA}"
+        echo "Event name: ${{ github.event_name }}"
+        git fetch origin ${BASE_SHA} || true
+        changed_files=$(git diff --name-only ${BASE_SHA} || echo "")
         echo "Changed files: ${changed_files}"
         checked_directory="patches/"
+        echo "Checking for files starting with: ${checked_directory}"
         for file in ${changed_files}
         do
+          echo "Checking file: ${file}"
           if [[ ${file} == ${checked_directory}* ]]
           then
-            echo "Target directory was modified."
+            echo "Target directory was modified. Found file: ${file}"
             echo "changes_found=true" >>$GITHUB_OUTPUT
             exit 0
           fi
