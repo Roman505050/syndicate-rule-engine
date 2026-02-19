@@ -1518,7 +1518,7 @@ class HighLevelReportsHandler(AbstractHandler):
         for tenant_name in event.tenant_names:
             tenant = self._mc.tenant_service().get(tenant_name)
             customer = self._mc.customer_service().get(tenant_name)
-            contacts = tenant.contacts + customer.admins
+            contacts: set = tenant.contacts | customer.admins
 
             for receiver in event.receivers:
                 if receiver.name in contacts:
